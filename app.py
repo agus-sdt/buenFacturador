@@ -83,7 +83,6 @@ def dashboard():
 
 with app.app_context():
     try:
-        # Crear tablas solo si no existen (no borra las existentes)
         db.create_all()
         
         print("Sistema iniciado correctamente")
