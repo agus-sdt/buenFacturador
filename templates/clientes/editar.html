@@ -1,0 +1,247 @@
+{% extends "base.html" %}
+
+{% block title %}Editar Cliente - Sistema de Facturación{% endblock %}
+
+{% block page_title %}Editar Cliente{% endblock %}
+
+{% block breadcrumb %}
+{{ super() }}
+<li class="breadcrumb-item"><a href="{{ url_for('clientes.lista_clientes') }}">Clientes</a></li>
+<li class="breadcrumb-item active">Editar #{{ cliente.id_cliente }}</li>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <div class="card card-warning">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="fas fa-user-edit"></i> Editar Cliente #{{ cliente.id_cliente }}
+                </h3>
+            </div>
+
+            <form method="POST">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="nombre">Nombre Completo <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="nombre" name="nombre"
+                                    value="{{ cliente.nombre }}" required>
+                                <small class="form-text text-muted">Nombre completo del cliente</small>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="email">Email</label>
+                                <input type="email" class="form-control" id="email" name="email"
+                                    value="{{ cliente.email or '' }}">
+                                <small class="form-text text-muted">Correo electrónico del cliente</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="telefono">Teléfono</label>
+                                <input type="text" class="form-control" id="telefono" name="telefono"
+                                    value="{{ cliente.telefono or '' }}" placeholder="+54 341 123-4567">
+                                <small class="form-text text-muted">Número de contacto del cliente</small>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>ID del Cliente</label>
+                                <input type="text" class="form-control" value="#{{ cliente.id_cliente }}" disabled>
+                                <small class="form-text text-muted">Identificador único (no editable)</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="direccion">Dirección</label>
+                        <textarea class="form-control" id="direccion" name="direccion" rows="3"
+                            placeholder="Dirección completa del cliente">{{ cliente.direccion or '' }}</textarea>
+                        <small class="form-text text-muted">Dirección física del cliente</small>
+                    </div>
+
+                </div>
+
+                <div class="card-footer">
+                    <button type="submit" class="btn btn-warning">
+                        <i class="fas fa-save"></i> Actualizar Cliente
+                    </button>
+                    <a href="{{ url_for('clientes.lista_clientes') }}" class="btn btn-secondary ml-2">
+                        <i class="fas fa-arrow-left"></i> Volver a la Lista
+                    </a>
+                    <a href="{{ url_for('clientes.ver_cliente', id=cliente.id_cliente) }}" class="btn btn-info ml-2">
+                        <i class="fas fa-eye"></i> Ver Detalles
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card card-primary">
+            <div class="card-header">
+                <h3 class="card-title">Información Actual</h3>
+            </div>
+            <div class="card-body">
+                <dl class="row">
+                    <dt class="col-sm-4">ID:</dt>
+                    <dd class="col-sm-8"><span class="badge badge-info">#{{ cliente.id_cliente }}</span></dd>
+
+                    <dt class="col-sm-4">Nombre:</dt>
+                    <dd class="col-sm-8">{{ cliente.nombre }}</dd>
+
+                    <dt class="col-sm-4">Email:</dt>
+                    <dd class="col-sm-8">
+                        {% if cliente.email %}
+                        <i class="fas fa-envelope text-success"></i> {{ cliente.email }}
+                        {% else %}
+                        <span class="text-muted">No registrado</span>
+                        {% endif %}
+                    </dd>
+
+                    <dt class="col-sm-4">Teléfono:</dt>
+                    <dd class="col-sm-8">
+                        {% if cliente.telefono %}
+                        <i class="fas fa-phone text-success"></i> {{ cliente.telefono }}
+                        {% else %}
+                        <span class="text-muted">No registrado</span>
+                        {% endif %}
+                    </dd>
+
+                    <dt class="col-sm-4">Dirección:</dt>
+                    <dd class="col-sm-8">
+                        {% if cliente.direccion %}
+                        <i class="fas fa-map-marker-alt text-success"></i> {{ cliente.direccion }}
+                        {% else %}
+                        <span class="text-muted">No registrada</span>
+                        {% endif %}
+                    </dd>
+                </dl>
+            </div>
+        </div>
+
+        <div class="card card-info">
+            <div class="card-header">
+                <h3 class="card-title">Ayuda</h3>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <strong>Importante:</strong> Los cambios se reflejarán en futuras facturas.
+                </div>
+
+                <p><strong>Campos recomendados:</strong></p>
+                <ul>
+                    <li><i class="fas fa-envelope text-primary"></i> Email para envío de facturas</li>
+                    <li><i class="fas fa-phone text-success"></i> Teléfono para contacto</li>
+                    <li><i class="fas fa-map-marker-alt text-info"></i> Dirección para entregas</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="card card-secondary">
+            <div class="card-header">
+                <h3 class="card-title">Acciones</h3>
+            </div>
+            <div class="card-body">
+                <a href="{{ url_for('clientes.nuevo_cliente') }}" class="btn btn-block btn-success">
+                    <i class="fas fa-user-plus"></i> Crear Nuevo Cliente
+                </a>
+                <a href="{{ url_for('clientes.lista_clientes') }}" class="btn btn-block btn-primary mt-2">
+                    <i class="fas fa-list"></i> Lista de Clientes
+                </a>
+                    <a href="{{url_for('clientes.eliminar_cliente', id=cliente.id_cliente)}}"
+                        class="btn btn-danger btn-secondary ml-2
+                        onclick="return confirm('¿Estás seguro de eliminar este cliente?')">
+                        <i class="fas fa-trash"></i> Eliminar
+                    </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function () {
+        const valoresOriginales = {
+            nombre: $('#nombre').val(),
+            email: $('#email').val(),
+            telefono: $('#telefono').val(),
+            direccion: $('#direccion').val()
+        };
+
+        // Validación del formulario
+        $('form').on('submit', function (e) {
+            const nombre = $('#nombre').val().trim();
+
+            if (!nombre) {
+                alert('El nombre del cliente es obligatorio');
+                $('#nombre').focus();
+                e.preventDefault();
+                return false;
+            }
+
+            const hayChangios =
+                nombre !== valoresOriginales.nombre ||
+                $('#email').val() !== valoresOriginales.email ||
+                $('#telefono').val() !== valoresOriginales.telefono ||
+                $('#direccion').val() !== valoresOriginales.direccion;
+
+            if (!hayChangios) {
+                if (!confirm('No se detectaron cambios. ¿Deseas continuar?')) {
+                    e.preventDefault();
+                    return false;
+                }
+            }
+
+            $('button[type="submit"]').html('<i class="fas fa-spinner fa-spin"></i> Actualizando...').prop('disabled', true);
+        });
+
+        function detectarCambios() {
+            const hayChangios =
+                $('#nombre').val() !== valoresOriginales.nombre ||
+                $('#email').val() !== valoresOriginales.email ||
+                $('#telefono').val() !== valoresOriginales.telefono ||
+                $('#direccion').val() !== valoresOriginales.direccion;
+
+            if (hayChangios) {
+                $('button[type="submit"]').removeClass('btn-warning').addClass('btn-success').html('<i class="fas fa-save"></i> Guardar Cambios');
+            } else {
+                $('button[type="submit"]').removeClass('btn-success').addClass('btn-warning').html('<i class="fas fa-save"></i> Actualizar Cliente');
+            }
+        }
+
+        $('#nombre, #email, #telefono, #direccion').on('input', detectarCambios);
+
+        $('#telefono').on('input', function () {
+            let valor = $(this).val().replace(/\D/g, ''); // Solo números
+            if (valor.length >= 10) {
+                valor = valor.replace(/(\d{2})(\d{3})(\d{3})(\d{4})/, '+$1 $2 $3-$4');
+                $(this).val(valor);
+            }
+        });
+
+        $('#email').on('blur', function () {
+            const email = $(this).val();
+            if (email && !isValidEmail(email)) {
+                alert('Por favor ingresa un email válido');
+                $(this).focus();
+            }
+        });
+
+        function isValidEmail(email) {
+            const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return re.test(email);
+        }
+    });
+</script>
+{% endblock %}

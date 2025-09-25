@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Sistema de Facturación{% endblock %}</title>
+
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/admin-lte/3.2.0/css/adminlte.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.21/css/dataTables.bootstrap4.min.css">
+
+    {% block extra_css %}{% endblock %}
+
+    <style>
+        .content-wrapper {
+            background-color: #f4f6f9;
+        }
+
+        .card {
+            box-shadow: 0 0 1px rgba(0, 0, 0, .125), 0 1px 3px rgba(0, 0, 0, .2);
+        }
+
+        .info-box {
+            box-shadow: 0 0 1px rgba(0, 0, 0, .125), 0 1px 3px rgba(0, 0, 0, .2);
+        }
+
+        .btn-app {
+            border-radius: 3px;
+            margin: 0 5px 10px 0;
+        }
+
+        .sidebar-dark-primary .nav-sidebar>.nav-item>.nav-link.active {
+            background-color: #007bff;
+            color: #fff;
+        }
+    </style>
+</head>
+
+<body class="hold-transition sidebar-mini layout-fixed">
+    <div class="wrapper">
+        <nav class="main-header navbar navbar-expand navbar-white navbar-light">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
+                </li>
+                <li class="nav-item d-none d-sm-inline-block">
+                    <a href="{{ url_for('dashboard') }}" class="nav-link">Inicio</a>
+                </li>
+            </ul>
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" data-widget="fullscreen" href="#" role="button">
+                        <i class="fas fa-expand-arrows-alt"></i>
+                    </a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link" data-toggle="dropdown" href="#">
+                        <i class="far fa-user"></i>
+                        <span class="d-none d-md-inline ml-1">{{ current_user.nombre }}</span>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
+                        <span class="dropdown-item-text">
+                            <strong>{{ current_user.nombre }}</strong><br>
+                            <small class="text-muted">{{ current_user.email }}</small>
+                        </span>
+                        <div class="dropdown-divider"></div>
+                        <div class="dropdown-divider"></div>
+                        <a href="{{ url_for('auth.logout') }}" class="dropdown-item">
+                            <i class="fas fa-sign-out-alt mr-2"></i> Cerrar Sesión
+                        </a>
+                    </div>
+                </li>
+            </ul>
+        </nav>
+        <aside class="main-sidebar sidebar-dark-primary elevation-4">
+            <a href="{{ url_for('dashboard') }}" class="brand-link">
+                <i class="fas fa-home mr-2 ml-3" style="color: white; font-size: 1.5rem;"></i>
+                <span class="brand-text font-weight-light">buenFacturador</span>
+            </a>
+            <div class="sidebar">
+                <!-- Sidebar user panel -->
+                <div class="user-panel mt-3 pb-3 mb-3 d-flex align-items-center">
+                    <div class="image">
+                        <i class="fas fa-user-circle img-circle elevation-2" style="color: white; font-size: 2rem;"></i>
+                    </div>
+                    <div class="info">
+                        <a href="#" class="d-block">{{ current_user.nombre }}</a>
+                        <small class="text-muted">
+                            <i class="fas fa-circle text-success" style="font-size: 0.7rem;"></i>
+                            En línea
+                        </small>
+                    </div>
+                </div>
+                <nav class="mt-2">
+                    <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu"
+                        data-accordion="false">
+                        <li class="nav-item">
+                            <a href="{{ url_for('dashboard') }}"
+                                class="nav-link {% if request.endpoint == 'dashboard' %}active{% endif %}">
+                                <i class="nav-icon fas fa-tachometer-alt"></i>
+                                <p>Inicio</p>
+                            </a>
+                        </li>
+                        <li class="nav-item {% if request.blueprint == 'clientes' %}menu-open{% endif %}">
+                            <a href="#" class="nav-link {% if request.blueprint == 'clientes' %}active{% endif %}">
+                                <i class="nav-icon fas fa-users"></i>
+                                <p>
+                                    Clientes
+                                    <i class="fas fa-angle-left right"></i>
+                                </p>
+                            </a>
+                            <ul class="nav nav-treeview">
+                                <li class="nav-item">
+                                    <a href="{{ url_for('clientes.lista_clientes') }}"
+                                        class="nav-link {% if request.endpoint == 'clientes.lista_clientes' %}active{% endif %}">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Lista de Clientes</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="{{ url_for('clientes.nuevo_cliente') }}"
+                                        class="nav-link {% if request.endpoint == 'clientes.nuevo_cliente' %}active{% endif %}">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Nuevo Cliente</p>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="nav-item {% if request.blueprint == 'productos' %}menu-open{% endif %}">
+                            <a href="#" class="nav-link {% if request.blueprint == 'productos' %}active{% endif %}">
+                                <i class="nav-icon fas fa-box"></i>
+                                <p>
+                                    Productos
+                                    <i class="fas fa-angle-left right"></i>
+                                </p>
+                            </a>
+                            <ul class="nav nav-treeview">
+                                <li class="nav-item">
+                                    <a href="{{ url_for('productos.lista_productos') }}"
+                                        class="nav-link {% if request.endpoint == 'productos.lista_productos' %}active{% endif %}">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Lista de Productos</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="{{ url_for('productos.nuevo_producto') }}"
+                                        class="nav-link {% if request.endpoint == 'productos.nuevo_producto' %}active{% endif %}">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Nuevo Producto</p>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                        <!-- Facturas -->
+                        <li class="nav-item {% if request.blueprint == 'facturas' %}menu-open{% endif %}">
+                            <a href="#" class="nav-link {% if request.blueprint == 'facturas' %}active{% endif %}">
+                                <i class="nav-icon fas fa-file-invoice"></i>
+                                <p>
+                                    Facturas
+                                    <i class="fas fa-angle-left right"></i>
+                                </p>
+                            </a>
+                            <ul class="nav nav-treeview">
+                                <li class="nav-item">
+                                    <a href="{{ url_for('facturas.lista_facturas') }}"
+                                        class="nav-link {% if request.endpoint == 'facturas.lista_facturas' %}active{% endif %}">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Lista de Facturas</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="{{ url_for('facturas.nueva_factura') }}"
+                                        class="nav-link {% if request.endpoint == 'facturas.nueva_factura' %}active{% endif %}">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Nueva Factura</p>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ url_for('reportes.menu_reportes') }}" class="nav-link">
+                                <i class="nav-icon fas fa-chart-bar"></i>
+                                <p>Reportes</p>
+                            </a>
+                        </li>
+
+                    </ul>
+                </nav>
+            </div>
+        </aside>
+
+        <div class="content-wrapper">
+            <div class="content-header">
+                <div class="container-fluid">
+                    <div class="row mb-2">
+                        <div class="col-sm-6">
+                            <h1 class="m-0">{% block page_title %}{% endblock %}</h1>
+                        </div>
+                        <div class="col-sm-6">
+                            <ol class="breadcrumb float-sm-right">
+                                {% block breadcrumb %}
+                                <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}">Inicio</a></li>
+                                {% endblock %}
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <section class="content">
+                <div class="container-fluid">
+
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                    {% for category, message in messages %}
+                    <div class="alert alert-{% if category == 'error' %}danger{% else %}{{ category }}{% endif %} alert-dismissible fade show"
+                        role="alert">
+                        {{ message }}
+                        <button type="button" class="close" data-dismiss="alert">
+                            <span>&times;</span>
+                        </button>
+                    </div>
+                    {% endfor %}
+                    {% endif %}
+                    {% endwith %}
+                    {% block content %}{% endblock %}
+
+                </div>
+            </section>
+        </div>
+
+        <footer class="main-footer">
+            <strong>Copyright &copy; 2024 <a href="#">buenFacturador</a>.</strong>
+            Todos los derechos reservados.
+            <div class="float-right d-none d-sm-inline-block">
+                <b>Usuario:</b> {{ current_user.nombre }} | <b>Versión</b> 1.0.0
+            </div>
+        </footer>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.6.0/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/admin-lte/3.2.0/js/adminlte.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.21/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.21/js/dataTables.bootstrap4.min.js"></script>
+
+    {% block extra_js %}{% endblock %}
+
+    <script>
+        function confirmarEliminacion(url, nombre) {
+            if (confirm(`¿Estás seguro de que quieres eliminar "${nombre}"?`)) {
+                window.location.href = url;
+            }
+        }
+    </script>
+</body>
+</html>

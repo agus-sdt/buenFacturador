@@ -1,0 +1,164 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Sistema de Facturación{% endblock %}
+
+{% block page_title %}Pagina principal{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item active">Dashboard</li>
+{% endblock %}
+
+{% block content %}
+
+<div class="row">
+  <div class="col-lg-3 col-6">
+    <div class="info-box">
+      <span class="info-box-icon bg-info"><i class="fas fa-users"></i></span>
+      <div class="info-box-content">
+        <span class="info-box-text">Clientes</span>
+        <span class="info-box-number">{{ total_clientes or 0 }}</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-3 col-6">
+    <div class="info-box">
+      <span class="info-box-icon bg-success"><i class="fas fa-box"></i></span>
+      <div class="info-box-content">
+        <span class="info-box-text">Productos</span>
+        <span class="info-box-number">{{ total_productos or 0 }}</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-3 col-6">
+    <div class="info-box">
+      <span class="info-box-icon bg-warning"><i class="fas fa-file-invoice"></i></span>
+      <div class="info-box-content">
+        <span class="info-box-text">Facturas</span>
+        <span class="info-box-number">{{ total_facturas or 0 }}</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-3 col-6">
+    <div class="info-box">
+      <span class="info-box-icon bg-danger"><i class="fas fa-dollar-sign"></i></span>
+      <div class="info-box-content">
+        <span class="info-box-text">Ventas Mes</span>
+        <span class="info-box-number">${{ "%.2f"|format(ventas_mes) }}</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-12">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">Accesos Rápidos</h3>
+      </div>
+      <div class="card-body">
+        <a href="{{ url_for('clientes.nuevo_cliente') }}" class="btn btn-app bg-success">
+          <i class="fas fa-user-plus"></i> Nuevo Cliente
+        </a>
+        <a href="{{ url_for('productos.nuevo_producto') }}" class="btn btn-app bg-info">
+          <i class="fas fa-plus"></i> Nuevo Producto
+        </a>
+        <a href="{{ url_for('facturas.nueva_factura') }}" class="btn btn-app bg-warning">
+          <i class="fas fa-file-invoice"></i> Nueva Factura
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">Últimos Clientes Registrados</h3>
+        <div class="card-tools">
+          <a href="{{ url_for('clientes.lista_clientes') }}" class="btn btn-sm btn-primary">Ver Todos</a>
+        </div>
+      </div>
+      <div class="card-body p-0">
+        {% if ultimos_clientes %}
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th>Nombre</th>
+              <th>Email</th>
+              <th>Teléfono</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for cliente in ultimos_clientes %}
+            <tr>
+              <td>{{ cliente.nombre }}</td>
+              <td>{{ cliente.email or '-' }}</td>
+              <td>{{ cliente.telefono or '-' }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        {% else %}
+        <div class="p-3 text-center text-muted">
+          <i class="fas fa-users fa-3x mb-3"></i>
+          <p>No hay clientes registrados aún</p>
+          <a href="{{ url_for('clientes.nuevo_cliente') }}" class="btn btn-primary">Agregar Primer Cliente</a>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">Actividad Reciente</h3>
+      </div>
+      <div class="card-body">
+        <div class="timeline">
+          <div class="time-label">
+            <span class="bg-green">Hoy</span>
+          </div>
+          <div>
+            <i class="fas fa-user bg-blue"></i>
+            <div class="timeline-item">
+              <span class="time"><i class="fas fa-clock"></i> hace 2 horas</span>
+              <h3 class="timeline-header">Sistema iniciado</h3>
+              <div class="timeline-body">
+                Dashboard AdminLTE integrado correctamente con Flask
+              </div>
+            </div>
+          </div>
+          <div>
+            <i class="fas fa-box bg-success"></i>
+            <div class="timeline-item">
+              <span class="time"><i class="fas fa-clock"></i> hace 1 hora</span>
+              <h3 class="timeline-header">Productos disponibles</h3>
+              <div class="timeline-body">
+                {{ total_productos or 0 }} productos registrados en el sistema
+              </div>
+            </div>
+          </div>
+          <div>
+            <i class="fas fa-users bg-info"></i>
+            <div class="timeline-item">
+              <span class="time"><i class="fas fa-clock"></i> hace 30 min</span>
+              <h3 class="timeline-header">Clientes activos</h3>
+              <div class="timeline-body">
+                {{ total_clientes or 0 }} clientes registrados
+              </div>
+            </div>
+          </div>
+          <div>
+            <i class="far fa-clock bg-gray"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+
+{% block title %}Reportes - buenFacturador{% endblock %}
+
+{% block page_title %}Reportes{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}">Inicio</a></li>
+<li class="breadcrumb-item active">Reportes</li>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Reportes Disponibles</h3>
+                <div class="card-tools">
+                    <span class="badge badge-info">2 reportes</span>
+                </div>
+            </div>
+            <div class="card-body">
+                <p class="text-muted">Selecciona el tipo de reporte que deseas generar:</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card card-primary">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="fas fa-users"></i> Facturas por Cliente
+                </h3>
+            </div>
+            <div class="card-body">
+                <p>Visualiza las facturas agrupadas por cliente con resúmenes de ventas y estados.</p>
+                <ul class="list-unstyled">
+                    <li><i class="fas fa-check text-success"></i> Filtro por cliente específico</li>
+                    <li><i class="fas fa-check text-success"></i> Filtro por estado de factura</li>
+                    <li><i class="fas fa-check text-success"></i> Totales por cliente</li>
+                    <li><i class="fas fa-check text-success"></i> Detalle de todas las facturas</li>
+                </ul>
+            </div>
+            <div class="card-footer">
+                <a href="{{ url_for('reportes.facturas_por_cliente') }}" class="btn btn-primary btn-block">
+                    <i class="fas fa-chart-bar"></i> Generar Reporte
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card card-success">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="fas fa-calendar-alt"></i> Ventas por Período
+                </h3>
+            </div>
+            <div class="card-body">
+                <p>Analiza las ventas en rangos de tiempo específicos con diferentes agrupaciones.</p>
+                <ul class="list-unstyled">
+                    <li><i class="fas fa-check text-success"></i> Rango de fechas personalizable</li>
+                    <li><i class="fas fa-check text-success"></i> Agrupación por día, mes o año</li>
+                    <li><i class="fas fa-check text-success"></i> Filtros por estado</li>
+                    <li><i class="fas fa-check text-success"></i> Gráficos interactivos</li>
+                </ul>
+            </div>
+            <div class="card-footer">
+                <a href="{{ url_for('reportes.ventas_por_periodo') }}" class="btn btn-success btn-block">
+                    <i class="fas fa-chart-line"></i> Generar Reporte
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card card-info">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="fas fa-info-circle"></i> Información sobre Reportes
+                </h3>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <h5><i class="fas fa-filter text-primary"></i> Filtros Dinámicos</h5>
+                        <p>Todos los reportes incluyen filtros personalizables para obtener exactamente la información que necesitas.</p>
+                    </div>
+                    <div class="col-md-4">
+                        <h5><i class="fas fa-download text-success"></i> Exportación</h5>
+                        <p>Los reportes se pueden visualizar en pantalla y están optimizados para impresión directa.</p>
+                    </div>
+                    <div class="col-md-4">
+                        <h5><i class="fas fa-clock text-warning"></i> Tiempo Real</h5>
+                        <p>Todos los datos se actualizan en tiempo real basándose en la información actual del sistema.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

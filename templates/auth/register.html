@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro - FacturadorPro</title>
+    
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/admin-lte/3.2.0/css/adminlte.min.css">
+</head>
+<body class="hold-transition register-page">
+<div class="register-box">
+    <div class="register-logo">
+        <a href="#"><b>buen</b>Facturador</a>
+    </div>
+
+    <div class="card">
+        <div class="card-body register-card-body">
+            <p class="login-box-msg">Regístrate para comenzar</p>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            {% for category, message in messages %}
+            <div class="alert alert-{% if category == 'error' %}danger{% else %}{{ category }}{% endif %} alert-dismissible">
+                {{ message }}
+                <button type="button" class="close" data-dismiss="alert">
+                    <span>&times;</span>
+                </button>
+            </div>
+            {% endfor %}
+            {% endif %}
+            {% endwith %}
+
+            <form action="{{ url_for('auth.register') }}" method="post" id="registerForm">
+                <div class="input-group mb-3">
+                    <input type="text" class="form-control" placeholder="Nombre completo" name="nombre" required>
+                    <div class="input-group-append">
+                        <div class="input-group-text">
+                            <span class="fas fa-user"></span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="input-group mb-3">
+                    <input type="email" class="form-control" placeholder="Email" name="email" required>
+                    <div class="input-group-append">
+                        <div class="input-group-text">
+                            <span class="fas fa-envelope"></span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="input-group mb-3">
+                    <input type="password" class="form-control" placeholder="Contraseña (mín. 6 caracteres)" 
+                            name="password" required minlength="6" id="password">
+                    <div class="input-group-append">
+                        <div class="input-group-text">
+                            <span class="fas fa-lock"></span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="input-group mb-3">
+                    <input type="password" class="form-control" placeholder="Confirmar contraseña" 
+                            name="password_confirm" required id="password_confirm">
+                    <div class="input-group-append">
+                        <div class="input-group-text">
+                            <span class="fas fa-lock"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <div class="progress" style="height: 5px;">
+                        <div id="password-strength" class="progress-bar" style="width: 0%"></div>
+                    </div>
+                    <small id="password-help" class="form-text text-muted">La contraseña debe tener al menos 6 caracteres</small>
+                </div>
+
+                <div class="row">
+                    <div class="col-12">
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input" id="agreeTerms" name="terminos" value="1" required>
+                            <label class="form-check-label" for="agreeTerms">
+                                Acepto los <a href="#" data-toggle="modal" data-target="#termsModal">términos y condiciones</a>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-primary btn-block">Registrar</button>
+                    </div>
+                </div>
+            </form>
+
+            <p class="mb-0 mt-3">
+                <a href="{{ url_for('auth.login') }}" class="text-center">Ya tengo una cuenta</a>
+            </p>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="termsModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Términos y Condiciones</h4>
+                <button type="button" class="close" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <h5>Uso del Sistema FacturadorPro</h5>
+                <p>Al registrarte en FacturadorPro, aceptas lo siguiente:</p>
+                
+                <ul>
+                    <li>Utilizar el sistema de manera responsable y legal</li>
+                    <li>Mantener la confidencialidad de tus credenciales de acceso</li>
+                    <li>Proporcionar información veraz y actualizada</li>
+                    <li>No compartir tu cuenta con terceros</li>
+                    <li>Respetar los datos de clientes y proveedores</li>
+                </ul>
+                
+                <h5>Privacidad de Datos</h5>
+                <p>Nos comprometemos a:</p>
+                <ul>
+                    <li>Proteger tu información personal</li>
+                    <li>No compartir tus datos con terceros sin tu consentimiento</li>
+                    <li>Mantener la seguridad de la información almacenada</li>
+                </ul>
+                
+                <p><small>Al hacer clic en "Acepto", confirmas que has leído y aceptas estos términos.</small></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-primary" id="acceptTerms">Acepto</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.6.0/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/admin-lte/3.2.0/js/adminlte.min.js"></script>
+
+<script>
+$(document).ready(function() {
+    function checkPasswordMatch() {
+        const password = $('#password').val();
+        const confirm = $('#password_confirm').val();
+        
+        if (password && confirm) {
+            if (password === confirm) {
+                $('#password_confirm').removeClass('is-invalid').addClass('is-valid');
+            } else {
+                $('#password_confirm').removeClass('is-valid').addClass('is-invalid');
+            }
+        }
+    }
+
+    function updatePasswordStrength() {
+        const password = $('#password').val();
+        let strength = 0;
+        let color = 'danger';
+        let text = 'Muy débil';
+        
+        if (password.length >= 6) strength += 20;
+        if (password.match(/[a-z]/)) strength += 20;
+        if (password.match(/[A-Z]/)) strength += 20;
+        if (password.match(/[0-9]/)) strength += 20;
+        if (password.match(/[^a-zA-Z0-9]/)) strength += 20;
+        
+        if (strength >= 80) { color = 'success'; text = 'Muy fuerte'; }
+        else if (strength >= 60) { color = 'info'; text = 'Fuerte'; }
+        else if (strength >= 40) { color = 'warning'; text = 'Moderada'; }
+        else if (strength >= 20) { color = 'warning'; text = 'Débil'; }
+        
+        $('#password-strength')
+            .removeClass('bg-danger bg-warning bg-info bg-success')
+            .addClass('bg-' + color)
+            .css('width', strength + '%');
+            
+        $('#password-help').text(`Fortaleza: ${text}`);
+    }
+
+    $('#password').on('keyup', function() {
+        updatePasswordStrength();
+        checkPasswordMatch();
+    });
+    
+    $('#password_confirm').on('keyup', checkPasswordMatch);
+    
+    $('#acceptTerms').click(function() {
+        $('#agreeTerms').prop('checked', true);
+        $('#termsModal').modal('hide');
+    });
+
+    $('#registerForm').on('submit', function(e) {
+        const password = $('#password').val();
+        const confirm = $('#password_confirm').val();
+        
+        if (password !== confirm) {
+            e.preventDefault();
+            alert('Las contraseñas no coinciden');
+            return false;
+        }
+        
+        if (!$('#agreeTerms').is(':checked')) {
+            e.preventDefault();
+            alert('Debes aceptar los términos y condiciones');
+            return false;
+        }
+    });
+});
+</script>
+</body>
+</html>

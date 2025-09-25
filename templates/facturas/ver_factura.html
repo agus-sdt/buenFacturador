@@ -1,0 +1,372 @@
+{% extends "base.html" %}
+
+{% block title %}Factura {{ factura.numero_factura }} - Sistema de Facturación{% endblock %}
+
+{% block page_title %}Detalle de Factura{% endblock %}
+
+{% block breadcrumb %}
+{{ super() }}
+<li class="breadcrumb-item"><a href="{{ url_for('facturas.lista_facturas') }}">Facturas</a></li>
+<li class="breadcrumb-item active">{{ factura.numero_factura }}</li>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <div class="card card-primary">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="fas fa-file-invoice"></i> Factura {{ factura.numero_factura }}
+                </h3>
+                <div class="card-tools">
+                    {% if factura.estado == 'pendiente' %}
+                    <span class="badge badge-warning badge-lg">
+                        <i class="fas fa-clock"></i> Pendiente
+                    </span>
+                    {% elif factura.estado == 'pagada' %}
+                    <span class="badge badge-success badge-lg">
+                        <i class="fas fa-check"></i> Pagada
+                    </span>
+                    {% elif factura.estado == 'cancelada' %}
+                    <span class="badge badge-danger badge-lg">
+                        <i class="fas fa-times"></i> Cancelada
+                    </span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="card-body">
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <h5>Información de la Factura</h5>
+                        <dl class="row">
+                            <dt class="col-sm-4">Número:</dt>
+                            <dd class="col-sm-8"><strong>{{ factura.numero_factura }}</strong></dd>
+
+                            <dt class="col-sm-4">Fecha:</dt>
+                            <dd class="col-sm-8">{{ factura.fecha.strftime('%d/%m/%Y') }}</dd>
+
+                            <dt class="col-sm-4">Estado:</dt>
+                            <dd class="col-sm-8">
+                                {% if factura.estado == 'pendiente' %}
+                                <span class="badge badge-warning">Pendiente</span>
+                                {% elif factura.estado == 'pagada' %}
+                                <span class="badge badge-success">Pagada</span>
+                                {% elif factura.estado == 'cancelada' %}
+                                <span class="badge badge-danger">Cancelada</span>
+                                {% endif %}
+                            </dd>
+
+                            <dt class="col-sm-4">Creada por:</dt>
+                            <dd class="col-sm-8">
+                                <i class="fas fa-user"></i> {{ factura.usuario_creador.nombre }}
+                                {% if factura.fecha_creacion %}
+                                <br><small class="text-muted">{{ factura.fecha_creacion.strftime('%d/%m/%Y')
+                                    }}</small>
+                                {% endif %}
+                            </dd>
+                        </dl>
+                    </div>
+
+                    <div class="col-md-6">
+                        <h5>Datos del Cliente</h5>
+                        <dl class="row">
+                            <dt class="col-sm-4">Cliente:</dt>
+                            <dd class="col-sm-8">
+                                <strong>{{ factura.cliente.nombre }}</strong>
+                                <a href="{{ url_for('clientes.ver_cliente', id=factura.cliente.id_cliente) }}"
+                                    class="btn btn-xs btn-outline-info ml-2" title="Ver cliente">
+                                    <i class="fas fa-external-link-alt"></i>
+                                </a>
+                            </dd>
+
+                            <dt class="col-sm-4">Email:</dt>
+                            <dd class="col-sm-8">
+                                {% if factura.cliente.email %}
+                                <i class="fas fa-envelope text-info"></i>
+                                <a href="mailto:{{ factura.cliente.email }}">{{ factura.cliente.email }}</a>
+                                {% else %}
+                                <span class="text-muted">No registrado</span>
+                                {% endif %}
+                            </dd>
+
+                            <dt class="col-sm-4">Teléfono:</dt>
+                            <dd class="col-sm-8">
+                                {% if factura.cliente.telefono %}
+                                <i class="fas fa-phone text-success"></i>
+                                <a href="tel:{{ factura.cliente.telefono }}">{{ factura.cliente.telefono }}</a>
+                                {% else %}
+                                <span class="text-muted">No registrado</span>
+                                {% endif %}
+                            </dd>
+
+                            <dt class="col-sm-4">Dirección:</dt>
+                            <dd class="col-sm-8">
+                                {% if factura.cliente.direccion %}
+                                <i class="fas fa-map-marker-alt text-warning"></i> {{ factura.cliente.direccion }}
+                                {% else %}
+                                <span class="text-muted">No registrada</span>
+                                {% endif %}
+                            </dd>
+                        </dl>
+                    </div>
+                </div>
+
+                {% if factura.observaciones %}
+
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <h5>Observaciones</h5>
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i> {{ factura.observaciones }}
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="card card-success">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="fas fa-shopping-cart"></i> Productos Facturados
+                </h3>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover">
+                        <thead class="thead-light">
+                            <tr>
+                                <th width="40%">Producto</th>
+                                <th width="15%" class="text-center">Cantidad</th>
+                                <th width="15%" class="text-right">Precio Unit.</th>
+                                <th width="15%" class="text-right">Subtotal</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for detalle in factura.detalles %}
+                            <tr>
+                                <td>
+                                    <strong>{{ detalle.descripcion_producto }}</strong>
+                                    {% if detalle.producto %}
+                                    <br><small class="text-muted">
+                                        Stock actual: {{ detalle.producto.stock }}
+                                        <a href="{{ url_for('productos.ver_producto', id=detalle.producto.id_producto) }}"
+                                            class="ml-2" title="Ver producto">
+                                            <i class="fas fa-external-link-alt"></i>
+                                        </a>
+                                    </small>
+                                    {% endif %}
+                                </td>
+                                <td class="text-center">
+                                    <span class="badge badge-info">{{ detalle.cantidad }}</span>
+                                </td>
+                                <td class="text-right">
+                                    ${{ "%.2f"|format(detalle.precio_unitario) }}
+                                </td>
+                                <td class="text-right">
+                                    <strong>${{ "%.2f"|format(detalle.subtotal) }}</strong>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card card-info">
+            <div class="card-header">
+                <h3 class="card-title">Resumen Financiero</h3>
+            </div>
+            <div class="card-body">
+                <table class="table">
+                    <tr>
+                        <td><strong>Subtotal:</strong></td>
+                        <td class="text-right">
+                            <span class="text-success">${{ "%.2f"|format(factura.subtotal) }}</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>IVA (21%):</strong></td>
+                        <td class="text-right">
+                            <span class="text-warning">${{ "%.2f"|format(factura.iva) }}</span>
+                        </td>
+                    </tr>
+                    <tr class="table-primary">
+                        <td><strong>TOTAL:</strong></td>
+                        <td class="text-right">
+                            <h4 class="text-primary">${{ "%.2f"|format(factura.total) }}</h4>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <div class="card card-secondary">
+            <div class="card-header">
+                <h3 class="card-title">Acciones</h3>
+            </div>
+            <div class="card-body">
+                {% if factura.estado == 'pendiente' %}
+                <a href="{{ url_for('facturas.editar_factura', id=factura.id_factura) }}"
+                    class="btn btn-warning btn-block">
+                    <i class="fas fa-edit"></i> Editar Factura
+                </a>
+                {% endif %}
+
+                <button type="button" class="btn btn-info btn-block mt-2" onclick="window.print()">
+                    <i class="fas fa-print"></i> Imprimir Factura
+                </button>
+
+                <a href="{{ url_for('facturas.lista_facturas') }}" class="btn btn-secondary btn-block mt-2">
+                    <i class="fas fa-arrow-left"></i> Volver a Lista
+                </a>
+
+                <a href="{{ url_for('facturas.eliminar_factura', id=factura.id_factura) }}"
+                    class="btn btn-danger btn-block mt-2"
+                    onclick="return confirmarEliminacion('{{ factura.numero_factura }}')">
+                    <i class="fas fa-trash"></i> Eliminar Factura
+                </a>
+            </div>
+        </div>
+
+        <div class="card card-warning">
+            <div class="card-header">
+                <h3 class="card-title">Cambiar Estado</h3>
+            </div>
+            <div class="card-body">
+                <div class="btn-group-vertical w-100" role="group">
+                    {% if factura.estado != 'pendiente' %}
+                    <a href="{{ url_for('facturas.cambiar_estado', id=factura.id_factura, nuevo_estado='pendiente') }}"
+                        class="btn btn-outline-warning">
+                        <i class="fas fa-clock"></i> Marcar como Pendiente
+                    </a>
+                    {% endif %}
+
+                    {% if factura.estado != 'pagada' %}
+                    <a href="{{ url_for('facturas.cambiar_estado', id=factura.id_factura, nuevo_estado='pagada') }}"
+                        class="btn btn-outline-success">
+                        <i class="fas fa-check"></i> Marcar como Pagada
+                    </a>
+                    {% endif %}
+
+                    {% if factura.estado != 'cancelada' %}
+                    <a href="{{ url_for('facturas.cambiar_estado', id=factura.id_factura, nuevo_estado='cancelada') }}"
+                        class="btn btn-outline-danger">
+                        <i class="fas fa-times"></i> Cancelar Factura
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="card card-light">
+            <div class="card-header">
+                <h3 class="card-title">Información del Sistema</h3>
+            </div>
+            <div class="card-body">
+                <small class="text-muted">
+                    <strong>ID Factura:</strong> {{ factura.id_factura }}<br>
+                    <strong>Fecha Creación:</strong>
+                    {% if factura.fecha_creacion %}
+                    {{ factura.fecha_creacion.strftime('%d/%m/%Y') }}
+                    {% else %}
+                    No disponible
+                    {% endif %}<br>
+                    <strong>Última Actualización:</strong>
+                    {% if factura.fecha_actualizacion %}
+                    {{ factura.fecha_actualizacion.strftime('%d/%m/%Y') }}
+                    {% else %}
+                    No disponible
+                    {% endif %}<br>
+                    <strong>Productos:</strong> {{ factura.detalles|length }} items<br>
+                    <strong>Usuario:</strong> {{ factura.usuario_creador.nombre }}
+                </small>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    @media print {
+
+        .main-sidebar,
+        .main-header,
+        .main-footer,
+        .card-header,
+        .breadcrumb,
+        .btn,
+        .content-header,
+        .card:nth-child(n+3) {
+            display: none !important;
+        }
+
+        .content-wrapper {
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+
+        .card {
+            border: none !important;
+            box-shadow: none !important;
+        }
+
+        .card-body {
+            padding: 0 !important;
+        }
+
+        body {
+            background: white !important;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function () {
+        window.confirmarEliminacion = function (numeroFactura) {
+            const confirmacion = confirm(
+                `¿Estás seguro de eliminar la factura "${numeroFactura}"?\n\n` +
+                `Esta acción:\n` +
+                `• Eliminará permanentemente la factura\n` +
+                `• Restaurará el stock de todos los productos\n` +
+                `• No se puede deshacer\n\n` +
+                `¿Continuar con la eliminación?`
+            );
+
+            return confirmacion;
+        };
+
+        $('a[href*="cambiar-estado"]').on('click', function (e) {
+            const accion = $(this).text().trim();
+            const confirmacion = confirm(`¿Confirma la siguiente acción?\n\n"${accion}"`);
+
+            if (!confirmacion) {
+                e.preventDefault();
+                return false;
+            }
+        });
+
+        $('[title]').tooltip();
+
+        $('button[onclick="window.print()"]').on('click', function () {
+            setTimeout(function () {
+                window.print();
+            }, 100);
+        });
+
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('created') === 'true') {
+            $('html, body').animate({
+                scrollTop: $('.card-info').offset().top - 100
+            }, 500);
+        }
+    });
+</script>
+{% endblock %}

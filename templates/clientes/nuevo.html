@@ -1,0 +1,155 @@
+{% extends "base.html" %}
+
+{% block title %}Nuevo Cliente - Sistema de Facturación{% endblock %}
+
+{% block page_title %}Nuevo Cliente{% endblock %}
+
+{% block breadcrumb %}
+{{ super() }}
+<li class="breadcrumb-item"><a href="{{ url_for('clientes.lista_clientes') }}">Clientes</a></li>
+<li class="breadcrumb-item active">Nuevo Cliente</li>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <div class="card card-primary">
+            <div class="card-header">
+                <h3 class="card-title">Información del Cliente</h3>
+            </div>
+
+            <form method="POST">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="nombre">Nombre Completo <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="nombre" name="nombre" required>
+                                <small class="form-text text-muted">Ingrese el nombre completo del cliente</small>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="email">Email</label>
+                                <input type="email" class="form-control" id="email" name="email">
+                                <small class="form-text text-muted">Correo electrónico del cliente</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="telefono">Teléfono</label>
+                                <input type="text" class="form-control" id="telefono" name="telefono"
+                                    placeholder="+54 341 123-4567">
+                                <small class="form-text text-muted">Número de contacto del cliente</small>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="cuit">CUIT</label>
+                                <input type="text" class="form-control" id="cuit" name="cuit"
+                                    placeholder="20-12345678-9">
+                                <small class="form-text text-muted">CUIT o CUIL del cliente</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="direccion">Dirección</label>
+                        <textarea class="form-control" id="direccion" name="direccion" rows="3"
+                            placeholder="Dirección completa del cliente"></textarea>
+                        <small class="form-text text-muted">Dirección física del cliente</small>
+                    </div>
+
+                </div>
+
+                <div class="card-footer">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Guardar Cliente
+                    </button>
+                    <a href="{{ url_for('clientes.lista_clientes') }}" class="btn btn-secondary ml-2">
+                        <i class="fas fa-times"></i> Cancelar
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card card-info">
+            <div class="card-header">
+                <h3 class="card-title">Ayuda</h3>
+            </div>
+            <div class="card-body">
+                <p><strong>Campos obligatorios:</strong></p>
+                <ul>
+                    <li><i class="fas fa-user text-primary"></i> Nombre completo</li>
+                </ul>
+
+                <p><strong>Información adicional:</strong></p>
+                <ul>
+                    <li><i class="fas fa-envelope text-info"></i> Email para envío de facturas</li>
+                    <li><i class="fas fa-phone text-success"></i> Teléfono de contacto</li>
+                    <li><i class="fas fa-id-card text-warning"></i> CUIT para facturación</li>
+                    <li><i class="fas fa-map-marker-alt text-danger"></i> Dirección de entrega</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="card card-warning">
+            <div class="card-header">
+                <h3 class="card-title">Acciones Rápidas</h3>
+            </div>
+            <div class="card-body">
+                <a href="{{ url_for('clientes.lista_clientes') }}" class="btn btn-block btn-outline-primary">
+                    <i class="fas fa-list"></i> Ver Lista de Clientes
+                </a>
+                <a href="{{ url_for('dashboard') }}" class="btn btn-block btn-outline-secondary mt-2">
+                    <i class="fas fa-home"></i> Volver al Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function () {
+        $('form').on('submit', function (e) {
+            const nombre = $('#nombre').val().trim();
+
+            if (!nombre) {
+                alert('El nombre del cliente es obligatorio');
+                $('#nombre').focus();
+                e.preventDefault();
+                return false;
+            }
+
+            $('button[type="submit"]').html('<i class="fas fa-spinner fa-spin"></i> Guardando...').prop('disabled', true);
+        });
+
+        $('#telefono').on('input', function () {
+            let valor = $(this).val().replace(/\D/g, ''); // Solo números
+            if (valor.length >= 10) {
+                valor = valor.replace(/(\d{2})(\d{3})(\d{3})(\d{4})/, '+$1 $2 $3-$4');
+                $(this).val(valor);
+            }
+        });
+
+        $('#cuit').on('input', function () {
+            let valor = $(this).val().replace(/\D/g, ''); // Solo números
+            if (valor.length >= 11) {
+                valor = valor.replace(/(\d{2})(\d{8})(\d{1})/, '$1-$2-$3');
+                $(this).val(valor);
+            }
+        });
+
+        $('#nombre').focus();
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}Detalle de Producto{% endblock %}
+
+{% block page_title %}Detalle de Producto{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}">Inicio</a></li>
+<li class="breadcrumb-item"><a href="{{ url_for('productos.lista_productos') }}">Productos</a></li>
+<li class="breadcrumb-item active">Detalle</li>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header bg-primary text-white">
+        <h3 class="card-title">Detalle del Producto</h3>
+    </div>
+    <div class="card-body">
+        <dl class="row">
+            <dt class="col-sm-3">ID</dt>
+            <dd class="col-sm-9">{{ producto.id }}</dd>
+
+            <dt class="col-sm-3">Descripción</dt>
+            <dd class="col-sm-9">{{ producto.descripcion }}</dd>
+
+            <dt class="col-sm-3">Precio</dt>
+            <dd class="col-sm-9">${{ "%.2f"|format(producto.precio) }}</dd>
+
+            <dt class="col-sm-3">Stock</dt>
+            <dd class="col-sm-9">{{ producto.stock }}</dd>
+        </dl>
+    </div>
+    <div class="card-footer d-flex justify-content-between">
+        <a href="{{ url_for('productos.lista_productos') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Volver
+        </a>
+        <a href="{{ url_for('productos.editar_producto', id=producto.id_producto) }}" class="btn btn-primary">
+            <i class="fas fa-edit"></i> Editar
+        </a>
+    </div>
+</div>
+{% endblock %}

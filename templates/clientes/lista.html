@@ -1,0 +1,195 @@
+{% extends "base.html" %}
+
+{% block title %}Lista de Clientes - Sistema de Facturación{% endblock %}
+
+{% block page_title %}Lista de Clientes{% endblock %}
+
+{% block breadcrumb %}
+{{ super() }}
+<li class="breadcrumb-item active">Clientes</li>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="fas fa-users"></i> Gestión de Clientes
+                </h3>
+                <div class="card-tools">
+                    <a href="{{ url_for('clientes.nuevo_cliente') }}" class="btn btn-primary">
+                        <i class="fas fa-user-plus"></i> Nuevo Cliente
+                    </a>
+                </div>
+            </div>
+
+            <div class="card-body">
+                {% if clientes %}
+                <div class="table-responsive">
+                    <table id="clientes-table" class="table table-bordered table-hover data-table">
+                        <thead>
+                            <tr>
+                                <th width="8%">ID</th>
+                                <th width="25%">Nombre</th>
+                                <th width="25%">Email</th>
+                                <th width="15%">Teléfono</th>
+                                <th width="15%">Ciudad</th>
+                                <th width="12%">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for cliente in clientes %}
+                            <tr>
+                                <td><span class="badge badge-info">#{{ cliente.id_cliente }}</span></td>
+                                <td>
+                                    <strong>{{ cliente.nombre }}</strong>
+                                </td>
+                                <td>
+                                    {% if cliente.email %}
+                                    <i class="fas fa-envelope text-primary"></i> {{ cliente.email }}
+                                    {% else %}
+                                    <span class="text-muted">Sin email</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if cliente.telefono %}
+                                    <i class="fas fa-phone text-success"></i> {{ cliente.telefono }}
+                                    {% else %}
+                                    <span class="text-muted">Sin teléfono</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if cliente.direccion %}
+                                    <i class="fas fa-map-marker-alt text-warning"></i>
+                                    {{ cliente.direccion[:30] }}{% if cliente.direccion|length > 30 %}...{% endif %}
+                                    {% else %}
+                                    <span class="text-muted">Sin dirección</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        <a href="{{ url_for('clientes.ver_cliente', id=cliente.id_cliente) }}"
+                                            class="btn btn-info btn-sm" title="Ver detalles">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a href="{{ url_for('clientes.editar_cliente', id=cliente.id_cliente) }}"
+                                            class="btn btn-warning btn-sm" title="Editar">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <a href="{{url_for('clientes.eliminar_cliente', id=cliente.id_cliente)}}"
+                                            class="btn btn-danger btn-sm"
+                                            onclick="return confirm('¿Estás seguro de eliminar este cliente?')">
+                                            <i class="fas fa-trash"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-users fa-5x text-muted mb-4"></i>
+                    <h4 class="text-muted">No hay clientes registrados</h4>
+                    <p class="text-muted">Comienza agregando tu primer cliente</p>
+                    <a href="{{ url_for('clientes.nuevo_cliente') }}" class="btn btn-primary btn-lg">
+                        <i class="fas fa-user-plus"></i> Agregar Primer Cliente
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+
+            {% if clientes %}
+            <div class="card-footer">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <small class="text-muted">
+                            Total de clientes: <strong>{{ clientes|length }}</strong>
+                        </small>
+                    </div>
+                    <div class="col-sm-6 text-right">
+                        <small class="text-muted">
+                            Con email: <strong>{{ clientes|selectattr('email')|list|length }}</strong> |
+                            Con teléfono: <strong>{{ clientes|selectattr('telefono')|list|length }}</strong>
+                        </small>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-3 col-6">
+        <div class="small-box bg-info">
+            <div class="inner">
+                <h3>{{ clientes|length }}</h3>
+                <p>Total Clientes</p>
+            </div>
+            <div class="icon">
+                <i class="fas fa-users"></i>
+            </div>
+            <a href="{{ url_for('clientes.nuevo_cliente') }}" class="small-box-footer">
+                Agregar Cliente <i class="fas fa-arrow-circle-right"></i>
+            </a>
+        </div>
+    </div>
+
+    <div class="col-lg-3 col-6">
+        <div class="small-box bg-success">
+            <div class="inner">
+                <h3>{{ clientes|selectattr('email')|list|length }}</h3>
+                <p>Con Email</p>
+            </div>
+            <div class="icon">
+                <i class="fas fa-envelope"></i>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-3 col-6">
+        <div class="small-box bg-warning">
+            <div class="inner">
+                <h3>{{ clientes|selectattr('telefono')|list|length }}</h3>
+                <p>Con Teléfono</p>
+            </div>
+            <div class="icon">
+                <i class="fas fa-phone"></i>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-3 col-6">
+        <div class="small-box bg-danger">
+            <div class="inner">
+                <h3>{{ clientes|selectattr('direccion')|list|length }}</h3>
+                <p>Con Dirección</p>
+            </div>
+            <div class="icon">
+                <i class="fas fa-map-marker-alt"></i>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function () {
+        $('#clientes-table').DataTable({
+            "language": {
+                "url": "//cdn.datatables.net/plug-ins/1.10.21/i18n/Spanish.json"
+            },
+            "responsive": true,
+            "autoWidth": false,
+            "order": [[0, "desc"]],
+            "columnDefs": [
+                { "orderable": false, "targets": 5 } 
+            ]
+        });
+    });
+</script>
+{% endblock %}

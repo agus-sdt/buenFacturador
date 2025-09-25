@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalle del cliente</title>
+</head>
+
+<body>
+    {% extends "base.html" %}
+
+    {% block title %}Ver Cliente - {{ cliente.nombre }}{% endblock %}
+
+    {% block page_title %}Detalles del Cliente{% endblock %}
+
+    {% block breadcrumb %}
+    {{ super() }}
+    <li class="breadcrumb-item"><a href="{{ url_for('clientes.lista_clientes') }}">Clientes</a></li>
+    <li class="breadcrumb-item active">Ver #{{ cliente.id_cliente }}</li>
+    {% endblock %}
+
+    {% block content %}
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card card-primary">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-user"></i> {{ cliente.nombre }}
+                    </h3>
+                    <div class="card-tools">
+                        <span class="badge badge-info">ID: #{{ cliente.id_cliente }}</span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <dl class="row">
+                                <dt class="col-sm-4">Nombre:</dt>
+                                <dd class="col-sm-8">
+                                    <h5>{{ cliente.nombre }}</h5>
+                                </dd>
+
+                                <dt class="col-sm-4">ID Cliente:</dt>
+                                <dd class="col-sm-8"><span class="badge badge-info">#{{ cliente.id_cliente }}</span>
+                                </dd>
+
+                                <dt class="col-sm-4">Email:</dt>
+                                <dd class="col-sm-8">
+                                    {% if cliente.email %}
+                                    <i class="fas fa-envelope text-success"></i>
+                                    <a href="mailto:{{ cliente.email }}">{{ cliente.email }}</a>
+                                    {% else %}
+                                    <span class="text-muted">No registrado</span>
+                                    {% endif %}
+                                </dd>
+                            </dl>
+                        </div>
+
+                        <div class="col-md-6">
+                            <dl class="row">
+                                <dt class="col-sm-4">Teléfono:</dt>
+                                <dd class="col-sm-8">
+                                    {% if cliente.telefono %}
+                                    <i class="fas fa-phone text-success"></i>
+                                    <a href="tel:{{ cliente.telefono }}">{{ cliente.telefono }}</a>
+                                    {% else %}
+                                    <span class="text-muted">No registrado</span>
+                                    {% endif %}
+                                </dd>
+
+                                <dt class="col-sm-4">Dirección:</dt>
+                                <dd class="col-sm-8">
+                                    {% if cliente.direccion %}
+                                    <i class="fas fa-map-marker-alt text-warning"></i> {{ cliente.direccion }}
+                                    {% else %}
+                                    <span class="text-muted">No registrada</span>
+                                    {% endif %}
+                                </dd>
+
+                                <dt class="col-sm-4">Estado:</dt>
+                                <dd class="col-sm-8">
+                                    <span class="badge badge-success">Activo</span>
+                                </dd>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-footer">
+                    <a href="{{ url_for('clientes.editar_cliente', id=cliente.id_cliente) }}" class="btn btn-warning">
+                        <i class="fas fa-edit"></i> Editar Cliente
+                    </a>
+                    <a href="{{ url_for('clientes.lista_clientes') }}" class="btn btn-secondary ml-2">
+                        <i class="fas fa-arrow-left"></i> Volver a la Lista
+                    </a>
+                    <a href="{{url_for('clientes.eliminar_cliente', id=cliente.id_cliente)}}" class="btn btn-danger btn-secondary ml-2
+                        onclick=" return confirm('¿Estás seguro de eliminar este cliente?')">
+                        <i class="fas fa-trash"></i> Eliminar
+                    </a>
+                </div>
+            </div>
+
+            <div class="card card-info">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-file-invoice"></i> Historial de Facturas
+                    </h3>
+                </div>
+                <div class="card-body">
+                    {% if cliente.facturas %}
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Número</th>
+                                <th>Fecha</th>
+                                <th>Total</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for factura in cliente.facturas %}
+                            <tr>
+                                <td>{{ factura.numero_factura }}</td>
+                                <td>{{ factura.fecha.strftime('%d/%m/%Y') }}</td>
+                                <td>${{ "%.2f"|format(factura.total) }}</td>
+                                <td>
+                                    <span
+                                        class="badge badge-{% if factura.estado == 'pagada' %}success{% elif factura.estado == 'pendiente' %}warning{% else %}danger{% endif %}">
+                                        {{ factura.estado|title }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <a href="{{ url_for('facturas.ver_factura', id=factura.id_factura) }}"
+                                        class="btn btn-info btn-sm">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    {% else %}
+                    <div class="text-center py-3">
+                        <i class="fas fa-file-invoice fa-3x text-muted"></i>
+                        <p class="text-muted mt-2">No hay facturas registradas para este cliente</p>
+                        <a href="{{ url_for('facturas.nueva_factura', cliente_id=cliente.id_cliente) }}"
+                            class="btn btn-primary">
+                            <i class="fas fa-plus"></i> Crear Primera Factura
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card card-success">
+                <div class="card-header">
+                    <h3 class="card-title">Información de Contacto</h3>
+                </div>
+                <div class="card-body">
+                    <div class="info-box mb-3">
+                        <span class="info-box-icon bg-info"><i class="fas fa-envelope"></i></span>
+                        <div class="info-box-content">
+                            <span class="info-box-text">Email</span>
+                            <span class="info-box-number">
+                                {% if cliente.email %}
+                                <small>{{ cliente.email }}</small>
+                                {% else %}
+                                <small class="text-muted">No registrado</small>
+                                {% endif %}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="info-box mb-3">
+                        <span class="info-box-icon bg-success"><i class="fas fa-phone"></i></span>
+                        <div class="info-box-content">
+                            <span class="info-box-text">Teléfono</span>
+                            <span class="info-box-number">
+                                {% if cliente.telefono %}
+                                <small>{{ cliente.telefono }}</small>
+                                {% else %}
+                                <small class="text-muted">No registrado</small>
+                                {% endif %}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="info-box">
+                        <span class="info-box-icon bg-warning"><i class="fas fa-map-marker-alt"></i></span>
+                        <div class="info-box-content">
+                            <span class="info-box-text">Dirección</span>
+                            <span class="info-box-number">
+                                {% if cliente.direccion %}
+                                <small>{{ cliente.direccion[:50] }}{% if cliente.direccion|length > 50 %}...{% endif
+                                    %}</small>
+                                {% else %}
+                                <small class="text-muted">No registrada</small>
+                                {% endif %}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card card-warning">
+                <div class="card-header">
+                    <h3 class="card-title">Estadísticas</h3>
+                </div>
+                <div class="card-body">
+                    <dl class="row">
+                        <dt class="col-sm-6">Total Facturas:</dt>
+                        <dd class="col-sm-6"><span class="badge badge-primary">0</span></dd>
+
+                        <dt class="col-sm-6">Total Compras:</dt>
+                        <dd class="col-sm-6"><span class="text-success font-weight-bold">$0.00</span></dd>
+
+                        <dt class="col-sm-6">Última Compra:</dt>
+                        <dd class="col-sm-6"><span class="text-muted">Nunca</span></dd>
+
+                        <dt class="col-sm-6">Estado:</dt>
+                        <dd class="col-sm-6"><span class="badge badge-success">Activo</span></dd>
+                    </dl>
+                </div>
+            </div>
+
+            <div class="card card-secondary">
+                <div class="card-header">
+                    <h3 class="card-title">Acciones Rápidas</h3>
+                </div>
+                <div class="card-body">
+
+                    <a href="{{ url_for('facturas.nueva_factura', cliente_id=cliente.id_cliente) }}"
+                        class="btn btn-block btn-warning mt-2">
+                        <i class="fas fa-file-invoice"></i> Nueva Factura
+                    </a>
+
+                    <a href="{{ url_for('clientes.editar_cliente', id=cliente.id_cliente) }}"
+                        class="btn btn-block btn-outline-primary mt-2">
+                        <i class="fas fa-edit"></i> Editar Datos
+                    </a>
+                </div>
+            </div>
+
+            <div class="card card-light">
+                <div class="card-header">
+                    <h3 class="card-title">Información del Sistema</h3>
+                </div>
+                <div class="card-body">
+                    <small class="text-muted">
+                        <strong>ID del Cliente:</strong> {{ cliente.id_cliente }}<br>
+                        <strong>Registro:</strong> Sistema de Facturación<br>
+                        <strong>Estado:</strong> Activo<br>
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endblock %}
+
+    {% block extra_js %}
+    <script>
+        $(document).ready(function () {
+            function copiarTexto(texto) {
+                navigator.clipboard.writeText(texto).then(function () {
+                    toastr.success('Copiado al portapapeles');
+                }, function (err) {
+                    console.error('Error al copiar: ', err);
+                });
+            }
+
+            $('a[href^="mailto:"], a[href^="tel:"]').on('contextmenu', function (e) {
+                e.preventDefault();
+                const texto = $(this).text();
+                copiarTexto(texto);
+                return false;
+            });
+
+            window.confirmarEliminacion = function (url, nombre) {
+                const confirmacion = confirm(
+                    `¿Estás seguro de que quieres eliminar el cliente "${nombre}"?\n\n` +
+                    `Esta acción no se puede deshacer y eliminará:\n` +
+                    `• Todos los datos del cliente\n` +
+                    `• Su historial de facturas (cuando esté disponible)\n\n` +
+                    `¿Continuar con la eliminación?`
+                );
+
+                if (confirmacion) {
+                    window.location.href = url;
+                }
+            };
+        });
+    </script>
+    {% endblock %}
+</body>
+
+</html>

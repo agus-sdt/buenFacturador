@@ -1,0 +1,241 @@
+{% extends "base.html" %}
+
+{% block title %}Facturas por Cliente - buenFacturador{% endblock %}
+
+{% block page_title %}Facturas por Cliente{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}">Inicio</a></li>
+<li class="breadcrumb-item"><a href="{{ url_for('reportes.menu_reportes') }}">Reportes</a></li>
+<li class="breadcrumb-item active">Facturas por Cliente</li>
+{% endblock %}
+
+{% block content %}
+
+<div class="row">
+    <div class="col-12">
+        <div class="card card-primary">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="fas fa-filter"></i> Filtros
+                </h3>
+            </div>
+            <div class="card-body">
+                <form method="GET">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="cliente_id">Cliente</label>
+                                <select name="cliente_id" class="form-control">
+                                    <option value="">-- Todos los clientes --</option>
+                                    {% for cliente in clientes %}
+                                    <option value="{{ cliente.id_cliente }}" 
+                                        {% if request.args.get('cliente_id')|int == cliente.id_cliente %}selected{% endif %}>
+                                        {{ cliente.nombre }} {{ cliente.apellido }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="form-group">
+                                <label>&nbsp;</label>
+                                <div>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-search"></i> Filtrar
+                                    </button>
+                                    <a href="{{ url_for('reportes.facturas_por_cliente') }}" class="btn btn-secondary">
+                                        <i class="fas fa-times"></i> Limpiar
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if datos_reporte %}
+    {% if datos_reporte.modo == 'general' %}
+
+        <div class="row">
+            <div class="col-lg-3 col-6">
+                <div class="small-box bg-info">
+                    <div class="inner">
+                        <h3>{{ datos_reporte.clientes|length }}</h3>
+                        <p>Clientes</p>
+                    </div>
+                    <div class="icon"><i class="fas fa-users"></i></div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-6">
+                <div class="small-box bg-success">
+                    <div class="inner">
+                        <h3>{{ datos_reporte.clientes|sum(attribute='total_facturas') }}</h3>
+                        <p>Facturas</p>
+                    </div>
+                    <div class="icon"><i class="fas fa-file-invoice"></i></div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-6">
+                <div class="small-box bg-warning">
+                    <div class="inner">
+                        <h3>${{ "%.2f"|format(datos_reporte.clientes|sum(attribute='total_monto')) }}</h3>
+                        <p>Total Facturado</p>
+                    </div>
+                    <div class="icon"><i class="fas fa-dollar-sign"></i></div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-6">
+                <div class="small-box bg-danger">
+                    <div class="inner">
+                        <h3>${{ "%.2f"|format((datos_reporte.clientes|sum(attribute='total_monto')) / (datos_reporte.clientes|length)) }}</h3>
+                        <p>Promedio por Cliente</p>
+                    </div>
+                    <div class="icon"><i class="fas fa-calculator"></i></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header"><h3 class="card-title">Facturas por Cliente</h3></div>
+            <div class="card-body table-responsive p-0">
+                <table class="table table-hover text-nowrap">
+                    <thead>
+                        <tr>
+                            <th>Cliente</th>
+                            <th>Total Facturas</th>
+                            <th>Pendientes</th>
+                            <th>Pagadas</th>
+                            <th>Anuladas</th>
+                            <th class="text-right">Total Facturado</th>
+                            <th class="text-center">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for c in datos_reporte.clientes %}
+                        <tr>
+                            <td>{{ c.cliente.nombre }} {{ c.cliente.apellido }}</td>
+                            <td>{{ c.total_facturas }}</td>
+                            <td>{{ c.pendientes }}</td>
+                            <td>{{ c.pagadas }}</td>
+                            <td>{{ c.anuladas }}</td>
+                            <td class="text-right">${{ "%.2f"|format(c.total_monto) }}</td>
+                            <td class="text-center">
+                                <a href="{{ url_for('reportes.facturas_por_cliente', cliente_id=c.cliente.id_cliente) }}" 
+                                    class="btn btn-sm btn-info" title="Ver detalle">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                <a href="{{ url_for('clientes.ver_cliente', id=c.cliente.id_cliente) }}" 
+                                    class="btn btn-sm btn-primary" title="Ver cliente">
+                                    <i class="fas fa-user"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    {% elif datos_reporte.modo == 'detalle' %}
+
+        <div class="row">
+            <div class="col-lg-3 col-6">
+                <div class="small-box bg-info">
+                    <div class="inner">
+                        <h3>{{ datos_reporte.cliente.nombre }} {{ datos_reporte.cliente.apellido }}</h3>
+                        <p>Cliente</p>
+                    </div>
+                    <div class="icon"><i class="fas fa-user"></i></div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-6">
+                <div class="small-box bg-success">
+                    <div class="inner">
+                        <h3>{{ datos_reporte.total_facturas }}</h3>
+                        <p>Facturas</p>
+                    </div>
+                    <div class="icon"><i class="fas fa-file-invoice"></i></div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-6">
+                <div class="small-box bg-warning">
+                    <div class="inner">
+                        <h3>${{ "%.2f"|format(datos_reporte.total_monto) }}</h3>
+                        <p>Total Facturado</p>
+                    </div>
+                    <div class="icon"><i class="fas fa-dollar-sign"></i></div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-6">
+                <div class="small-box bg-danger">
+                    <div class="inner">
+                        <h3>{{ datos_reporte.total_pagadas }}</h3>
+                        <p>Total Pagadas</p>
+                    </div>
+                    <div class="icon"><i class="fas fa-check"></i></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Facturas de {{ datos_reporte.cliente.nombre }}</h3>
+                <div class="card-tools">
+                    <a href="{{ url_for('reportes.facturas_por_cliente') }}" class="btn btn-sm btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Volver al resumen
+                    </a>
+                </div>
+            </div>
+            <div class="card-body table-responsive p-0">
+                <table class="table table-hover text-nowrap">
+                    <thead>
+                        <tr>
+                            <th>Número</th>
+                            <th>Fecha</th>
+                            <th>Estado</th>
+                            <th class="text-right">Total</th>
+                            <th class="text-center">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for f in datos_reporte.facturas %}
+                        <tr>
+                            <td>{{ f.numero_factura }}</td>
+                            <td>{{ f.fecha.strftime('%d/%m/%Y') }}</td>
+                            <td>
+                                {% if f.estado == 'pendiente' %}
+                                <span class="badge badge-warning">{{ f.estado|title }}</span>
+                                {% elif f.estado == 'pagada' %}
+                                <span class="badge badge-success">{{ f.estado|title }}</span>
+                                {% elif f.estado in ['anulada', 'cancelada'] %}
+                                <span class="badge badge-danger">{{ f.estado|title }}</span>
+                                {% else %}
+                                <span class="badge badge-secondary">{{ f.estado|title }}</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-right">${{ "%.2f"|format(f.total) }}</td>
+                            <td class="text-center">
+                                <a href="{{ url_for('facturas.ver_factura', id=f.id_factura) }}" 
+                                    class="btn btn-sm btn-info" title="Ver detalle de factura">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                {% if f.estado == 'pendiente' %}
+                                <a href="{{ url_for('facturas.editar_factura', id=f.id_factura) }}" 
+                                    class="btn btn-sm btn-warning" title="Editar factura">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    {% endif %}
+{% endif %}
+{% endblock %}
