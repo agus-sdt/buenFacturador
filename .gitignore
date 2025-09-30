@@ -1,3 +1,6 @@
 node_modules 
 __pycache__
 .vscode
+buenaFacturacionBDD.sql
+migrar_sqlite.py
+crear_admin.py

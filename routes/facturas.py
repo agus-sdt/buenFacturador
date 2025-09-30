@@ -7,17 +7,20 @@ from models.cliente import Cliente
 from models.producto import Producto
 from datetime import datetime, timezone
 from decimal import Decimal
+from decoradores import role_required 
 
 facturas_bp = Blueprint("facturas", __name__, url_prefix="/facturas")
 
 @facturas_bp.route("/")
 @login_required
+@role_required('admin', 'usuario')
 def lista_facturas():
     facturas = Factura.query.order_by(Factura.fecha.desc()).all()
     return render_template("facturas/lista_facturas.html", facturas=facturas)
 
 @facturas_bp.route("/nueva", methods=["GET", "POST"])
 @login_required
+@role_required('admin', 'usuario')
 def nueva_factura():
     if request.method == "POST":
         try:
@@ -82,12 +85,14 @@ def nueva_factura():
 
 @facturas_bp.route("/ver/<int:id>")
 @login_required
+@role_required('admin', 'usuario')
 def ver_factura(id):
     factura = Factura.query.get_or_404(id)
     return render_template("facturas/ver_factura.html", factura=factura)
 
 @facturas_bp.route("/editar/<int:id>", methods=["GET", "POST"])
 @login_required
+@role_required('admin', 'usuario')
 def editar_factura(id):
     factura = Factura.query.get_or_404(id)
 
@@ -154,6 +159,7 @@ def editar_factura(id):
 
 @facturas_bp.route("/eliminar/<int:id>")
 @login_required
+@role_required('admin', 'usuario')
 def eliminar_factura(id):
     factura = Factura.query.get_or_404(id)
     
@@ -174,6 +180,7 @@ def eliminar_factura(id):
 
 @facturas_bp.route("/cambiar-estado/<int:id>/<nuevo_estado>")
 @login_required
+@role_required('admin', 'usuario')
 def cambiar_estado(id, nuevo_estado):
     factura = Factura.query.get_or_404(id)
     
@@ -189,6 +196,7 @@ def cambiar_estado(id, nuevo_estado):
 
 @facturas_bp.route("/api/producto/<int:id>")
 @login_required
+@role_required('admin', 'usuario')
 def api_producto(id):
     producto = Producto.query.get_or_404(id)
     return jsonify({

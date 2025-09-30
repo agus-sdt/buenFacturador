@@ -1,9 +1,11 @@
-from flask import Flask,redirect,url_for,render_template,request
+from flask import Flask,redirect,url_for,render_template,request, flash
 from flask_login import login_required, current_user
 from config import Config
 from extensions import db, login_manager
 from sqlalchemy import text, func, extract
 from datetime import datetime
+from functools import wraps
+from decoradores import role_required 
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -16,14 +18,6 @@ from models.cliente import Cliente
 from models.producto import Producto
 from models.factura import Factura
 from models.detalle_factura import DetalleFactura
-
-
-
-@login_manager.user_loader
-def load_user(user_id):
-    return Usuario.query.get(int(user_id))
-
-
 from routes.auth import auth_bp
 from routes.clientes import clientes_bp
 from routes.productos import productos_bp
@@ -36,6 +30,11 @@ app.register_blueprint(clientes_bp)
 app.register_blueprint(productos_bp)
 app.register_blueprint(facturas_bp)
 app.register_blueprint(reportes_bp)
+
+
+@login_manager.user_loader
+def load_user(user_id):
+    return Usuario.query.get(int(user_id))
 
 
 
@@ -78,6 +77,27 @@ def dashboard():
     ultimos_clientes = Cliente.query.order_by(Cliente.id_cliente.desc()).limit(5).all()
 
     return render_template('dashboard.html', total_clientes=total_clientes, total_productos=total_productos, total_facturas=total_facturas, total_ventas_mes=total_ventas_mes, ultimos_clientes=ultimos_clientes, ventas_mes=ventas_mes)
+
+
+@app.route("/admin/usuarios")
+@login_required
+@role_required("admin")
+def administrar_usuarios():
+    return "Gestión de usuarios (solo admin)"
+
+@app.route("/facturar")
+@login_required
+@role_required("usuario")
+def facturar():
+    return "Aquí flujo: Seleccionar cliente → Agregar productos → Confirmar factura"
+
+
+@app.route("/consultar_factura")
+@login_required
+@role_required("usuario")
+def consultar_factura():
+    return "Aquí flujo: Buscar por cliente o fecha → Ver detalle"
+
 
 
 

@@ -14,6 +14,7 @@ class Usuario(db.Model, UserMixin):
     activo = db.Column(db.Boolean, default=True)
     fecha_registro = db.Column(db.DateTime, default=datetime.now, nullable=False)
     ultimo_acceso = db.Column(db.DateTime, nullable=True)
+    rol = db.Column(db.String(20), default="usuario", nullable=False)
     
     def set_password(self, password_text):
         """Hashea y guarda la contraseña"""
@@ -32,4 +33,4 @@ class Usuario(db.Model, UserMixin):
         return str(self.id_usuario)
 
     def __repr__(self):
-        return f"<Usuario {self.email}>"
+        return f"<Usuario {self.email} - Rol {self.rol}>"

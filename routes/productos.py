@@ -2,15 +2,18 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash
 from extensions import db
 from models.producto import Producto
 from sqlalchemy import DECIMAL
+from decoradores import role_required 
 
 productos_bp = Blueprint("productos", __name__, url_prefix="/productos")
 
 @productos_bp.route("/")
+@role_required('admin')
 def lista_productos():
     productos = Producto.query.all()
     return render_template("productos/listaProductos.html", productos=productos)
 
 @productos_bp.route("/nuevoProducto", methods=["GET", "POST"])
+@role_required('admin')
 def nuevo_producto():
     if request.method == "POST":
         descripcion = request.form["descripcion"]
@@ -35,6 +38,7 @@ def nuevo_producto():
     return render_template("productos/nuevoProducto.html")
 
 @productos_bp.route("/editarProducto/<int:id>", methods=["GET", "POST"])
+@role_required('admin')
 def editar_producto(id):
     producto = Producto.query.get_or_404(id)
 
@@ -54,6 +58,7 @@ def editar_producto(id):
     return render_template("productos/editarProducto.html", producto=producto)
 
 @productos_bp.route("/eliminar/<int:id>")
+@role_required('admin')
 def eliminar_producto(id):
     producto = Producto.query.get_or_404(id)
     
@@ -69,6 +74,7 @@ def eliminar_producto(id):
 
 
 @productos_bp.route("/verProducto/<int:id>", methods=["GET", "POST"])
+@role_required('admin')
 def ver_producto(id):
     producto = Producto.query.get_or_404(id)
     return render_template("productos/verProducto.html", producto=producto)

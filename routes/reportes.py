@@ -7,7 +7,7 @@ from sqlalchemy import func, extract, and_, or_
 from datetime import datetime, timedelta
 from collections import defaultdict
 import calendar
-
+from decoradores import role_required 
 
 
 reportes_bp = Blueprint('reportes', __name__, url_prefix='/reportes')
